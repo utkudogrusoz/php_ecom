@@ -25,11 +25,11 @@
                         <form id="loginForm">
                             <div class="mb-3">
                                 <label for="loginEmail" class="form-label">E-posta:</label>
-                                <input type="email" class="form-control" id="loginEmail" required>
+                                <input type="email" class="form-control" id="loginEmail" name="email" required>
                             </div>
                             <div class="mb-3">
                                 <label for="loginPassword" class="form-label">Şifre:</label>
-                                <input type="password" class="form-control" id="loginPassword" required>
+                                <input type="password" class="form-control" id="loginPassword" name="password"required>
                             </div>
                             <button type="submit" class="btn btn-primary">Giriş Yap</button>
                         </form>

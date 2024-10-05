@@ -12,80 +12,71 @@ class AuthController extends Controller
         helper(["url", "form"]);
     }
 
-    public function showRegisterPage()
-    {
-        return view('Auth/RegisterView');
-    }
-
-    public function showLoginPage()
-    {
-        return view('Auth/LoginView');
-    }
-
     public function register()
     {
         $userModel = new UserModel();
 
-        // Formdan gelen verileri kontrol edin
-        $firstName = $this->request->getPost('first_name');
-        $lastName = $this->request->getPost('last_name');
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
-
-        if (empty($firstName)) {
-            return redirect()->back()->with('error', 'İsim boş olamaz.');
-        }
-
         $data = [
-            'first_name'    => $firstName,
-            'last_name'     => $lastName,
-            'email'         => $email,
-            'password' => $password
+            'first_name' => $this->request->getVar('first_name'),
+            'last_name'  => $this->request->getVar('last_name'),
+            'email'      => $this->request->getVar('email'),
+            'password'   => $this->request->getVar('password'),
         ];
 
-        // Veritabanına kaydetme
-        if ($userModel->insert($data)) {
-            return redirect()->to('/login')->with('message', 'Kullanıcı başarıyla oluşturuldu.');
-        } else {
-            return redirect()->back()->withInput()->with('errors', $userModel->errors());
+        // E-posta zaten kayıtlı mı kontrol et
+        if ($userModel->where('email', $data['email'])->first()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Bu e-posta zaten kayıtlı.']);
         }
+
+        $userModel->save($data);
+
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Kayıt başarılı.']);
     }
 
-
-    // Kullanıcı giriş işlemi
     public function login()
     {
         $userModel = new UserModel();
 
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+        $email    = $this->request->getVar('email');
+        $password = $this->request->getVar('password');
 
-        // E-posta ile kullanıcıyı bulma
         $user = $userModel->where('email', $email)->first();
 
         if ($user) {
-            // Şifreyi doğrulama
+            // Şifreyi kontrol et
             if (password_verify($password, $user['password'])) {
-                // Kullanıcıyı oturumda saklama
-                session()->set([
-                    'user_id'    => $user['id'],
-                    'first_name' => $user['first_name'],
-                    'is_logged_in' => true,
-                ]);
+                // Oturumu başlat
+                $session = session();
+                $session->set('isLoggedIn', true);
+                $session->set('user', $user);
 
-                return redirect()->to('/dashboard')->with('message', 'Giriş başarılı.');
+                return $this->response->setJSON(['status' => 'success', 'message' => 'Giriş başarılı.']);
             } else {
-                return redirect()->back()->with('error', 'Geçersiz şifre.');
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Hatalı şifre.']);
             }
         } else {
-            return redirect()->back()->with('error', 'Kullanıcı bulunamadı.');
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Kullanıcı bulunamadı.']);
         }
     }
 
-    // Oturumdan çıkış işlemi
     public function logout()
     {
-        session()->destroy();
-        return redirect()->to('/login');
+        $session = session();
+        $session->destroy();
+
+        return redirect()->to('/');
     }
+
+    public function checkAuthStatus()
+    {
+        $session = session();
+        $isLoggedIn = $session->get('isLoggedIn');
+        $user = $session->get('user');
+
+        return $this->response->setJSON([
+            'isLoggedIn' => $isLoggedIn ? true : false,
+            'user' => $isLoggedIn ? $user : null
+        ]);
+    }
+
 }

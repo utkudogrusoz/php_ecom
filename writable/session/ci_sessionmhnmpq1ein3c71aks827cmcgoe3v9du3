@@ -1,0 +1,1 @@
+__ci_last_regenerate|i:1728167921;__ci_vars|a:3:{s:5:"error";s:3:"old";s:13:"_ci_old_input";s:3:"new";s:6:"errors";s:3:"new";}error|s:17:"Geçersiz şifre.";_ci_old_input|a:2:{s:3:"get";a:0:{}s:4:"post";a:4:{s:10:"first_name";s:4:"Utku";s:9:"last_name";s:10:"Doğrusöz";s:5:"email";s:14:"utku@gmail.com";s:8:"password";s:3:"123";}}errors|a:0:{}
