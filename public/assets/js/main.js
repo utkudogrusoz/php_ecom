@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Kullanıcı oturum durumunu kontrol et
     function checkAuthStatus() {
         // Oturum kontrolü için sunucuya istek atacağız
-        fetch('/codeigniter/checkAuthStatus')
+        fetch(BASE_URL+'checkAuthStatus')
             .then(response => response.json())
             .then(data => {
                 if (data.isLoggedIn) {
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Çıkış yap fonksiyonu
     function logout() {
-        fetch('/codeigniter/logout')
+        fetch(BASE_URL+'logout')
             .then(() => {
                 checkAuthStatus();
             });
@@ -66,9 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         var formData = new FormData(loginForm);
-        console.log(formData)
 
-        fetch('/codeigniter/login', {
+        fetch(BASE_URL+'login', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken
@@ -95,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         var formData = new FormData(registerForm);
 
-        fetch('/codeigniter/register', {
+        fetch(BASE_URL+'register', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken
@@ -116,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Satın al butonu işlemleri
     buyButton.addEventListener('click', function() {
-        fetch('/codeigniter/checkAuthStatus')
+        fetch(BASE_URL+'checkAuthStatus')
             .then(response => response.json())
             .then(data => {
                 if (data.isLoggedIn) {

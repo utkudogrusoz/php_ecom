@@ -16,7 +16,21 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost/codeigniter';
+    public string $baseURL;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (ENVIRONMENT === 'production') {
+            $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
+            $host = $_SERVER['HTTP_HOST'];
+            $this->baseURL = $protocol . "://" . $host . '/';
+        } else {
+            $this->baseURL = 'http://localhost/codeigniter/';
+        }
+    }
+
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
