@@ -25,11 +25,11 @@
                         <form id="loginForm" autocomplete="off">
                             <div class="mb-3">
                                 <label for="loginEmail" class="form-label">E-Mail:</label>
-                                <input type="email" class="form-control" id="loginEmail" name="email" autocomplete="off" required>
+                                <input type="email" class="form-control" id="loginEmail" name="email" autocomplete="new-email" required>
                             </div>
                             <div class="mb-3">
                                 <label for="loginPassword" class="form-label">Password:</label>
-                                <input type="password" class="form-control" id="loginPassword" name="password" autocomplete="off" required>
+                                <input type="password" class="form-control" id="loginPassword" name="password" autocomplete="new-password" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Login</button>
                         </form>
@@ -39,7 +39,7 @@
                         <form id="registerForm" autocomplete="off">
                             <div class="mb-3">
                                 <label for="registerFirstName" class="form-label">First Name:</label>
-                                <input type="text" class="form-control" id="registerFirstName" name="first_name" required>
+                                <input type="text" class="form-control" id="registerFirstName" name="first_name" required autocomplete="off">
                             </div>
                             <div class="mb-3">
                                 <label for="registerLastName" class="form-label">Last Name:</label>
@@ -47,11 +47,11 @@
                             </div>
                             <div class="mb-3">
                                 <label for="registerEmail" class="form-label">E-Mail:</label>
-                                <input type="email" class="form-control" id="registerEmail" name="email" required>
+                                <input type="email" class="form-control" id="registerEmail" name="email" required autocomplete="new-email">
                             </div>
                             <div class="mb-3">
                                 <label for="registerPassword" class="form-label">Password:</label>
-                                <input type="password" class="form-control" id="registerPassword" name="password" required>
+                                <input type="password" class="form-control" id="registerPassword" name="password" required autocomplete="new-password">
                             </div>
                             <button type="submit" class="btn btn-success">Register</button>
                         </form>

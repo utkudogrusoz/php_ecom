@@ -18,12 +18,11 @@ class AuthController extends Controller
 
         $data = [
             'first_name' => $this->request->getVar('first_name'),
-            'last_name'  => $this->request->getVar('last_name'),
-            'email'      => $this->request->getVar('email'),
-            'password'   => $this->request->getVar('password'),
+            'last_name' => $this->request->getVar('last_name'),
+            'email' => $this->request->getVar('email'),
+            'password' => $this->request->getVar('password'),
         ];
 
-        // E-posta zaten kayıtlı mı kontrol et
         if ($userModel->where('email', $data['email'])->first()) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Bu e-posta zaten kayıtlı.']);
         }
@@ -37,15 +36,13 @@ class AuthController extends Controller
     {
         $userModel = new UserModel();
 
-        $email    = $this->request->getVar('email');
+        $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
 
         $user = $userModel->where('email', $email)->first();
 
         if ($user) {
-            // Şifreyi kontrol et
             if (password_verify($password, $user['password'])) {
-                // Oturumu başlat
                 $session = session();
                 $session->set('isLoggedIn', true);
                 $session->set('user', $user);
