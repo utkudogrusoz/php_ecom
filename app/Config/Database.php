@@ -29,7 +29,7 @@ class Database extends Config
         'hostname'     => 'localhost',
         'username'     => 'admin',
         'password'     => 'utku123456',
-        'database'     => 'test',
+        'database'     => 'commerce',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,

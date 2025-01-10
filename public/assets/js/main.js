@@ -1,132 +1,45 @@
-// public/assets/js/main.js
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Navbar'daki butonlar
-    var loginButton = document.getElementById('loginButton');
-    var registerButton = document.getElementById('registerButton');
-    var buyButton = document.getElementById('buyButton');
-    var purchaseMessage = document.getElementById('purchaseMessage');
 
-    // Modal ve sekme elemanları
-    var authModalEl = document.getElementById('authModal');
-    var authModal = new bootstrap.Modal(authModalEl);
-
-    // CSRF token'ını meta etiketinden al
-    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+document.addEventListener('DOMContentLoaded', function () {
 
     // Kullanıcı oturum durumunu kontrol et
-    function checkAuthStatus() {
-        // Oturum kontrolü için sunucuya istek atacağız
-        fetch(BASE_URL+'checkAuthStatus')
+    function checkAuth(callback) {
+        fetch(BASE_URL + 'checkAuthStatus')
             .then(response => response.json())
             .then(data => {
+
                 if (data.isLoggedIn) {
-                    // Kullanıcı giriş yapmışsa
-                    loginButton.textContent = 'Çıkış Yap';
-                    loginButton.onclick = logout;
-                    registerButton.style.display = 'none';
+                    console.log(data.isLoggedIn);
+                    // Kullanıcı giriş yapmışsa callback çalıştır
+                    if (callback && typeof callback === 'function') {
+                        callback();
+                    }
                 } else {
-                    // Kullanıcı giriş yapmamışsa
-                    loginButton.textContent = 'Giriş Yap';
-                    loginButton.onclick = showLoginTab;
-                    registerButton.style.display = 'block';
-                    registerButton.onclick = showRegisterTab;
+                    // Kullanıcı giriş yapmamışsa login popup aç
+                    showLoginTab();
                 }
             });
     }
 
     // Giriş Yap sekmesini göster
     function showLoginTab() {
-        var loginTabTrigger = document.querySelector('#login-tab');
-        var loginTab = new bootstrap.Tab(loginTabTrigger);
+        const loginTabTrigger = document.querySelector('#login-tab');
+        const loginTab = new bootstrap.Tab(loginTabTrigger);
         loginTab.show();
+        const authModalEl = document.getElementById('authModal');
+        const authModal = new bootstrap.Modal(authModalEl);
         authModal.show();
     }
 
-    // Kayıt Ol sekmesini göster
-    function showRegisterTab() {
-        var registerTabTrigger = document.querySelector('#register-tab');
-        var registerTab = new bootstrap.Tab(registerTabTrigger);
-        registerTab.show();
-        authModal.show();
-    }
-
-    // Çıkış yap fonksiyonu
-    function logout() {
-        fetch(BASE_URL+'logout')
-            .then(() => {
-                checkAuthStatus();
+    // Sepete ekleme butonları
+    document.querySelectorAll('.addToCart').forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = this.getAttribute('data-id');
+            checkAuth(() => {
+                // Kullanıcı giriş yapmışsa sepete ekleme işlemini başlat
+                alert('Ürün sepete eklendi! (Product ID: ' + productId + ')');
+                // Burada sepete ekleme işlemi için fetch ile istek gönderebilirsiniz
             });
-    }
-
-    // Giriş formu işlemleri
-    var loginForm = document.getElementById('loginForm');
-    var loginError = document.getElementById('loginError');
-
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var formData = new FormData(loginForm);
-
-        fetch(BASE_URL+'login', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    checkAuthStatus();
-                    authModal.hide();
-                    loginError.textContent = '';
-                } else {
-                    loginError.textContent = data.message;
-                }
-            });
+        });
     });
-
-    // Kayıt formu işlemleri
-    var registerForm = document.getElementById('registerForm');
-    var registerError = document.getElementById('registerError');
-
-    registerForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var formData = new FormData(registerForm);
-
-        fetch(BASE_URL+'register', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    checkAuthStatus();
-                    authModal.hide();
-                    registerError.textContent = '';
-                } else {
-                    registerError.textContent = data.message;
-                }
-            });
-    });
-
-    // Satın al butonu işlemleri
-    buyButton.addEventListener('click', function() {
-        fetch(BASE_URL+'checkAuthStatus')
-            .then(response => response.json())
-            .then(data => {
-                if (data.isLoggedIn) {
-                    // Satın alma işlemini gerçekleştirin
-                    purchaseMessage.textContent = 'Satın alındı!';
-                } else {
-                    showLoginTab(); // Giriş Yap sekmesini aç
-                }
-            });
-    });
-
-    // Sayfa yüklendiğinde oturum durumunu kontrol et
-    checkAuthStatus();
 });

@@ -1,4 +1,3 @@
-<!-- Modal -->
 <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -32,6 +31,7 @@
                                 <input type="password" class="form-control" id="loginPassword" name="password" autocomplete="new-password" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Login</button>
+                            <div id="loginError" class="text-danger mt-2"></div>
                         </form>
                     </div>
                     <!-- Kayıt Formu -->
@@ -54,6 +54,7 @@
                                 <input type="password" class="form-control" id="registerPassword" name="password" required autocomplete="new-password">
                             </div>
                             <button type="submit" class="btn btn-success">Register</button>
+                            <div id="registerError" class="text-danger mt-2"></div>
                         </form>
                     </div>
                 </div>

@@ -3,77 +3,91 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use CodeIgniter\Controller;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
-    public function __construct()
-    {
-        helper(["url", "form"]);
-    }
-
     public function register()
     {
-        $userModel = new UserModel();
+        // GET isteğinde kayıt formu gösterilir
+        return view('RegisterView');
+    }
 
-        $data = [
-            'first_name' => $this->request->getVar('first_name'),
-            'last_name' => $this->request->getVar('last_name'),
-            'email' => $this->request->getVar('email'),
-            'password' => $this->request->getVar('password'),
+    public function registerPost()
+    {
+        // POST isteğinden gelen form verisini işleyelim
+        $rules = [
+            'first_name' => 'required|min_length[2]',
+            'last_name'  => 'required|min_length[2]',
+            'email'      => 'required|valid_email|is_unique[users.email]',
+            'password'   => 'required|min_length[6]'
         ];
 
-        if ($userModel->where('email', $data['email'])->first()) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Bu e-posta zaten kayıtlı.']);
+        if (!$this->validate($rules)) {
+            return view('RegisterView', [
+                'validation' => $this->validator
+            ]);
         }
 
-        $userModel->save($data);
+        // Validasyon başarılı ise kullanıcı kaydını yap
+        $userModel = new UserModel();
+        $userModel->insert([
+            'first_name' => $this->request->getPost('first_name'),
+            'last_name'  => $this->request->getPost('last_name'),
+            'email'      => $this->request->getPost('email'),
+            // Dikkat: Şifreyi düz (plain text) alıyoruz, Model içinde hash'lenecek
+            'password'   => $this->request->getPost('password')
+        ]);
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Kayıt başarılı.']);
+        return redirect()->to('/login');
     }
 
     public function login()
     {
+        // GET isteğinde login formu gösterilir
+        return view('LoginView');
+    }
+
+    public function loginPost()
+    {
+        $rules = [
+            'email'    => 'required|valid_email',
+            'password' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            return view('LoginView', [
+                'validation' => $this->validator
+            ]);
+        }
+
+        $email    = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
+
         $userModel = new UserModel();
-
-        $email = $this->request->getVar('email');
-        $password = $this->request->getVar('password');
-
         $user = $userModel->where('email', $email)->first();
 
-        if ($user) {
-            if (password_verify($password, $user['password'])) {
-                $session = session();
-                $session->set('isLoggedIn', true);
-                $session->set('user', $user);
+        // Veritabanındaki hash'lenmiş şifreyle karşılaştır
+        if ($user && password_verify($password, $user['password'])) {
+            // Oturum aç
+            $this->session->set([
+                'user_id'    => $user['id'],
+                'first_name' => $user['first_name'],
+                'last_name'  => $user['last_name'],
+                'email'      => $user['email'],
+                'logged_in'  => true
+            ]);
 
-                return $this->response->setJSON(['status' => 'success', 'message' => 'Giriş başarılı.']);
-            } else {
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Hatalı şifre.']);
-            }
+            return redirect()->to('/');
         } else {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Kullanıcı bulunamadı.']);
+            return view('LoginView', [
+                'loginError' => 'Geçersiz e-posta veya şifre.'
+            ]);
         }
     }
 
     public function logout()
     {
-        $session = session();
-        $session->destroy();
-
+        $this->session->destroy();
         return redirect()->to('/');
     }
-
-    public function checkAuthStatus()
-    {
-        $session = session();
-        $isLoggedIn = $session->get('isLoggedIn');
-        $user = $session->get('user');
-
-        return $this->response->setJSON([
-            'isLoggedIn' => $isLoggedIn ? true : false,
-            'user' => $isLoggedIn ? $user : null
-        ]);
-    }
-
 }
